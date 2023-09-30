@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS CRUD</title>
+    <style>
+        #updateBtn,#cancelBtn{
+            display: none;
+        }
+        .active-btn{
+            display: inline-block !important;
+        }
+        .hide-btn{
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-form">
+        <input type="text" id="username" placeholder="Enter your name" value=""/>
+        <button id="addBtn">Add User</button>
+        <button id="updateBtn">Update</button>
+        <button id="cancelBtn" onclick="cancel()">Cancel</button>
+    </div>
+    <div id="user-list-section">
+
+    </div>
+
+    <script>
+        let addBtnElm=document.getElementById("addBtn");
+        let userInput=document.getElementById("username");
+        let userListSec=document.getElementById("user-list-section");
+        let updateBtn=document.getElementById("updateBtn");
+        let cancelBtn=document.getElementById("cancelBtn");
+        let editingUserId = null; 
+        let userData=[];
+
+        //Unique ID generator
+        function uniqueId(){
+            let x=Math.random();
+            return "fab"+x.toString().split(".")[1];
+        }
+
+        //Add new user
+        function addUser(){
+            let data={
+                id:uniqueId(),
+                username:userInput.value
+            }
+            if(data.username!=""){
+                userData.push(data);
+                userInput.value="";
+            }
+            else{
+                alert('enter a value')
+            }
+            addUserItems(userData);
+        }
+        
+        function addUserItems(data){
+            userListSec.innerHTML="";
+            let createUser=data.map(function(items,index){
+                return `<div class="user-item">
+                            <h3>${items.username}</h3>
+                            <button class="update-btn" onclick="editUser('${items.id}')">Edit</button>
+                            <button class="delete-btn" onclick="deleteUser('${items.id}')">Delete</button>
+                        </div>`
+            }).join("");
+            userListSec.innerHTML=createUser;
+        }
+
+        function deleteUser(id){
+            let updateUserData=userData.filter(function(item){
+                return item.id!==id;
+            })
+            userData=updateUserData;
+            addUserItems(userData);
+        }
+
+        function editUser(id){
+            let edituser=userData.find(function(item){
+                if(item.id==id){
+                    userInput.value=item.username;
+                    editingUserId = id;
+                }
+            })
+            
+            updateBtn.classList.add("active-btn");
+            cancelBtn.classList.add("active-btn");
+            addBtnElm.classList.add("hide-btn");
+            
+        }
+
+        
+        function cancel(){
+            userInput.value="";  
+            updateBtn.classList.remove("active-btn");
+            cancelBtn.classList.remove("active-btn");
+            addBtnElm.classList.remove("hide-btn");
+            addBtnElm.classList.add("active-btn");
+        }
+
+        function updateUser(id){ 
+            userData.map(function(item,index){
+                if(item.id==editingUserId){
+                    item.username=userInput.value
+                }
+            })
+            userInput.value="";
+            addUserItems(userData)
+            updateBtn.classList.remove("active-btn");
+            cancelBtn.classList.remove("active-btn");
+            addBtnElm.classList.remove("hide-btn");
+            addBtnElm.classList.add("active-btn");
+        
+    } 
+
+         //Add user event trigger
+        addBtnElm.addEventListener("click",addUser)
+        updateBtn.addEventListener('click',updateUser)
+
+    </script>
+</body>
+</html>
